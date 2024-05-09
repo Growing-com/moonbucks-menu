@@ -1,6 +1,11 @@
 const element = (selector) => document.querySelector(selector);
 
 const APP = () => {
+  const updateMenuCount = () => {
+    const menuCount = document.querySelectorAll(".menu-list-item").length;
+    element(".menu-count").textContent = `총 ${menuCount} 개`;
+  };
+
   const addMenu = () => {
     const menuName = element("#espresso-menu-name").value.trim();
 
@@ -8,7 +13,7 @@ const APP = () => {
       alert("메뉴를 입력하세요!");
       return;
     }
-    //추가 로직
+
     element("#espresso-menu-list").insertAdjacentHTML(
       "beforeend",
       `<li class="menu-list-item d-flex items-center py-2">
@@ -29,15 +34,46 @@ const APP = () => {
     );
 
     element("#espresso-menu-name").value = "";
+    updateMenuCount();
   };
 
   //
+  const editMenu = (event) => {
+    const menuNameElement = event.target
+      .closest("li")
+      .querySelector(".menu-name");
+    const newName = (
+      prompt("메뉴명을 수정하세요.", menuNameElement.textContent) || ""
+    ).trim();
+    if (newName !== "") {
+      menuNameElement.textContent = newName;
+    }
+  };
 
-  // 카테고리마다 변경.. 아 용어가 생각이 안나네
+  const removeMenu = (event) => {
+    const menuElement = event.target.closest("li");
+    const isConfirmed = confirm("정말 삭제하시겠습니까?");
+    if (isConfirmed) {
+      menuElement.remove();
+      updateMenuCount();
+    }
+  };
+
+  // 동적으로 변경?
   element("#espresso-menu-submit-button").addEventListener("click", addMenu);
+
   element("#espresso-menu-form").addEventListener("submit", (event) => {
     event.preventDefault();
     addMenu();
+  });
+
+  element("#espresso-menu-list").addEventListener("click", (event) => {
+    if (event.target.classList.contains("menu-edit-button")) {
+      editMenu(event);
+    }
+    if (event.target.classList.contains("menu-remove-button")) {
+      removeMenu(event);
+    }
   });
 };
 
